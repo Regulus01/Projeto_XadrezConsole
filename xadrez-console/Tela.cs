@@ -2,12 +2,45 @@
 using tabuleiro.enums;
 using xadrez;
 using System;
+using System.Collections.Generic;
 
 namespace xadrez_console
 {
     class Tela
     {
-        public static void imprimirTabuleiro(Tabuleiro tab)
+        public static void ImprimirPartida(PartidaDeXadrez partida)
+        {
+            Tela.ImprimirTabuleiro(partida.Tab);
+            Console.WriteLine();
+            ImprimirPecasCapturadas(partida);
+            Console.WriteLine();
+            Console.WriteLine("Turno: " + partida.Turno);
+            Console.WriteLine("Aguardando jogada: " + partida.JogadorAtual);
+        }
+        public static void ImprimirPecasCapturadas(PartidaDeXadrez partida)
+        {
+            Console.WriteLine("Peças capturadas: ");
+            Console.Write("Brancas: ");
+            ImprimirConjunto(partida.pecasCapturadas(Cor.Branca));
+            Console.WriteLine();
+            Console.Write("Pretas: ");
+            ConsoleColor aux = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Red;
+            ImprimirConjunto(partida.pecasCapturadas(Cor.Preta));
+            Console.ForegroundColor = aux;
+            Console.WriteLine();
+        }
+
+        public static void ImprimirConjunto(HashSet<Peca> conjunto)
+        {
+            Console.Write("[");
+            foreach (Peca item in conjunto)
+            {
+                Console.Write(item + " ");
+            }
+            Console.Write("] ");
+        }
+        public static void ImprimirTabuleiro(Tabuleiro tab)
         {
             for (int i = 0; i < tab.Linhas; i++)
             {
@@ -21,7 +54,7 @@ namespace xadrez_console
             Console.WriteLine("  A B C D E F G H");
         }
 
-        public static void imprimirTabuleiro(Tabuleiro tab, bool[,] posPossiveis)
+        public static void ImprimirTabuleiro(Tabuleiro tab, bool[,] posPossiveis)
             /* Sobrecarga que marca visualmente
              as possicoes possiveis de uma peca no tabuleiro */
         {
