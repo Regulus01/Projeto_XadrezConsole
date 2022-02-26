@@ -29,7 +29,6 @@ namespace xadrez
             if (Tab.PosicaoValida(pos) && PodeMover(pos))
             {
                 mat[pos.Linha, pos.Coluna] = true;
-
             }
 
             //posicao - nordeste
