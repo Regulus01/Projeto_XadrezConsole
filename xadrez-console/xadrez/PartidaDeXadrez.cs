@@ -13,6 +13,7 @@ namespace xadrez
         private readonly HashSet<Peca> pecas;
         private readonly HashSet<Peca> capturadas;
         public bool Xeque { get; private set; }
+        public Peca VulneravelEnPassant { get; private set; }
         public PartidaDeXadrez()
         {
             Tab = new Tabuleiro(8, 8);
@@ -20,6 +21,7 @@ namespace xadrez
             JogadorAtual = Cor.Branca;
             Terminada = false;
             Xeque = false;
+            VulneravelEnPassant = null;
             pecas = new HashSet<Peca>();
             capturadas = new HashSet<Peca>();
             ColocarPecas();
@@ -56,6 +58,26 @@ namespace xadrez
                 Tab.ColocarPeca(T, destinoT);
             }
 
+            //#jogada especial en passant
+            if (p is Peao)
+            {
+                if (origem.Coluna != destino.Coluna && pecaCapturada == null)
+                {
+                    Posicao posP;
+                    if (p.Cor == Cor.Branca)
+                    {
+                        posP = new Posicao(destino.Linha + 1, destino.Coluna);
+                    }
+                    else
+                    {
+                        posP = new Posicao(destino.Linha - 1, destino.Coluna);
+                    }
+
+                    pecaCapturada = Tab.RetiraPeca(posP);
+                    capturadas.Add(pecaCapturada);
+                }
+            }
+
             return pecaCapturada;
         }
 
@@ -73,8 +95,8 @@ namespace xadrez
             // #jogada especial roque pequeno
             if (p is Rei && destino.Coluna == origem.Coluna + 2)
             {
-                Posicao origemT = new Posicao(origem.Linha, origem.Coluna +3);
-                Posicao destinoT = new Posicao(origem.Linha, origem.Coluna+ 1);
+                Posicao origemT = new Posicao(origem.Linha, origem.Coluna + 3);
+                Posicao destinoT = new Posicao(origem.Linha, origem.Coluna + 1);
                 Peca T = Tab.RetiraPeca(destinoT);
                 T.IncrementarQteMovimentos();
                 Tab.ColocarPeca(T, origemT);
@@ -85,13 +107,33 @@ namespace xadrez
             if (p is Rei && destino.Coluna == origem.Coluna - 2)
             {
                 Posicao origemT = new Posicao(origem.Linha, origem.Coluna - 4);
-                Posicao destinoT = new Posicao(origem.Linha, origem.Coluna- 1);
+                Posicao destinoT = new Posicao(origem.Linha, origem.Coluna - 1);
                 Peca T = Tab.RetiraPeca(destinoT);
                 T.IncrementarQteMovimentos();
                 Tab.ColocarPeca(T, origemT);
             }
 
+            // #jogada especial en passant
+            if (p is Peao)
+            {
+                if (origem.Coluna != destino.Coluna &&
+                    pecaCapturada == VulneravelEnPassant)
+                {
+                    Peca peao = Tab.RetiraPeca(destino);
+                    Posicao posP;
+                    if (p.Cor == Cor.Branca)
+                    {
+                        posP = new Posicao(3, destino.Coluna);
 
+                    }
+                    else
+                    {
+                        posP = new Posicao(4, destino.Coluna);
+                    }
+
+                    Tab.ColocarPeca(peao, posP);
+                }
+            }
         }
         public void RealizaJogada(Posicao origem, Posicao destino)
         {
@@ -119,6 +161,19 @@ namespace xadrez
             {
                 Turno++;
                 MudaJogador();
+            }
+
+            Peca p = Tab.Peca(destino);
+
+            //#jogada especial En passant
+            if (p is Peao && (destino.Linha == origem.Linha - 2 ||
+                destino.Linha == origem.Linha + 2))
+            {
+                VulneravelEnPassant = p;
+            }
+            else
+            {
+                VulneravelEnPassant = null;
             }
 
         }
