@@ -1,4 +1,4 @@
-# Projetos_Curso_Csharp
+# Projeto_Curso_Csharp
 Projeto em C# feito sob a orientação do professor Nélio Alves - Udemy
 
 
